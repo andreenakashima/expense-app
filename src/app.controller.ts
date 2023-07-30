@@ -1,4 +1,13 @@
-import { Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { ReportType, data } from 'src/data';
 
 @Controller('report/:type')
@@ -21,8 +30,20 @@ export class AppController {
   }
 
   @Post()
-  createReport() {
-    return 'Created';
+  createReport(
+    @Body() { source, amount }: { source: string; amount: number },
+    @Param('type') type: string,
+  ) {
+    const newReport = {
+      id: randomUUID(),
+      source,
+      amount,
+      created_at: new Date(),
+      updated_at: new Date(),
+      type: type === 'income' ? ReportType.INCOME : ReportType.EXPENSE,
+    };
+    data.report.push(newReport);
+    return newReport;
   }
 
   @Put(':id')
